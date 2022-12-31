@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,19 +21,20 @@ import java.util.logging.Logger;
 import entity.payment.CreditCard;
 import entity.payment.PaymentTransaction;
 
-public class API {
+public class Application_programming_interface {
 
 	public static DateFormat DATE_FORMATER = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	private static Logger LOGGER = Utils.getLogger(Utils.class.getName());
 
 	public static String get(String url, String token) throws Exception {
 		LOGGER.info("Request URL: " + url + "\n");
-		URL line_api_url = new URL(url);
-		HttpURLConnection conn = (HttpURLConnection) line_api_url.openConnection();
-		conn.setDoInput(true);
-		conn.setDoOutput(true);
+		
+		
+		
+		HttpURLConnection conn = setConnection(url);
+		
+		
 		conn.setRequestMethod("GET");
-		conn.setRequestProperty("Content-Type", "application/json");
 		conn.setRequestProperty("Authorization", "Bearer " + token);
 		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		String inputLine;
@@ -45,20 +47,27 @@ public class API {
 		return respone.substring(0, respone.length() - 1).toString();
 	}
 
+	public static HttpURLConnection setConnection(String url) throws MalformedURLException, IOException {
+		URL line_api_url = new URL(url);
+		HttpURLConnection conn = (HttpURLConnection) line_api_url.openConnection();
+		conn.setDoInput(true);
+		conn.setDoOutput(true);
+		conn.setRequestProperty("Content-Type", "application/json");
+		return conn;
+	}
+
 	int var;
 
 	public static String post(String url, String data
 //			, String token
 	) throws IOException {
 		allowMethods("PATCH");
-		URL line_api_url = new URL(url);
 		String payload = data;
-		LOGGER.info("Request Info:\nRequest URL: " + url + "\n" + "Payload Data: " + payload + "\n");
-		HttpURLConnection conn = (HttpURLConnection) line_api_url.openConnection();
-		conn.setDoInput(true);
-		conn.setDoOutput(true);
+		
+		HttpURLConnection conn = setConnection(url);
+		
 		conn.setRequestMethod("PATCH");
-		conn.setRequestProperty("Content-Type", "application/json");
+		LOGGER.info("Request Info:\nRequest URL: " + url + "\n" + "Payload Data: " + payload + "\n");
 //		conn.setRequestProperty("Authorization", "Bearer " + token);
 		Writer writer = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
 		writer.write(payload);
